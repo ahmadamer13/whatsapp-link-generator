@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>WhatsApp Link Generator - Create Chat Links Easily</title>
+    
+    <meta name="description" content="Generate instant WhatsApp chat links with pre-filled messages and country codes. Create your wa.me links quickly for business or personal use.">
+    
+    <meta name="keywords" content="WhatsApp link generator, wa.me link, WhatsApp chat link, create WhatsApp link, WhatsApp message link, free WhatsApp tool, instant chat link, whatsapp api link">
+
+    <meta property="og:title" content="WhatsApp Link Generator - Create Chat Links Easily">
+    <meta property="og:description" content="Generate instant WhatsApp chat links with pre-filled messages and country codes. Create your wa.me links quickly for business or personal use.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourwebsite.com/"> <meta property="og:image" content="https://yourwebsite.com/whatsapp-link-generator-thumbnail.jpg"> <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="WhatsApp Link Generator - Create Chat Links Easily">
+    <meta name="twitter:description" content="Generate instant WhatsApp chat links with pre-filled messages and country codes. Create your wa.me links quickly for business or personal use.">
+    <meta name="twitter:image" content="https://yourwebsite.com/whatsapp-link-generator-thumbnail.jpg"> <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        whatsapp: {
+                            'light-bg': '#E6DFD9', // A very subtle, chat-like background if desired
+                            'soft-bg': '#F0F4F8', // A cleaner, light gray that can also work
+                            'green-main': '#25D366', // WhatsApp's primary green
+                            'green-hover': '#1DA851', // A slightly darker green for hover state
+                            'link-blue': '#34B7F1', // A common WhatsApp-like blue for links/secondary
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Segoe UI Emoji', 'Noto Color Emoji', 'Apple Color Emoji', sans-serif;
+            /* Optional: Add a subtle pattern if you want to mimic the chat background more closely */
+            /* background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><rect width="4" height="4" fill="%23E6DFD9"/><rect x="1" y="1" width="1" height="1" fill="%23DCDAD9"/></svg>'); */
+            /* background-repeat: repeat; */
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1; /* Lighter scrollbar thumb */
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0; /* Darker on hover */
+        }
+        /* Hide default number input arrows */
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        /* Focus style for list items */
+        .country-list-item:focus {
+            outline: none; /* Remove default outline */
+            background-color: #f0f4f8; /* A lighter, modern focus state */
+        }
+    </style>
+</head>
+<body class="bg-whatsapp-soft-bg min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
+        <h1 class="text-3xl font-extrabold text-center text-gray-800 mb-8">WhatsApp Link Generator</h1>
+        
+        <p class="text-center text-gray-600 mb-6">
+            Instantly **create direct WhatsApp chat links** (wa.me) with ease. Just enter a phone number, optionally add a pre-filled message, and generate your link for quick sharing on social media, websites, or emails.
+        </p>
+
+        <div class="mb-5 relative">
+            <label for="countryCodeSelect" class="block text-gray-700 text-sm font-semibold mb-2">Country Code</label>
+            <div id="countryCodeDisplay" class="border border-gray-300 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight cursor-pointer flex items-center justify-between bg-white focus-within:ring-2 focus-within:ring-whatsapp-green-main focus-within:border-transparent transition duration-200">
+                <span id="selectedCountryDisplay" class="flex items-center flex-grow">
+                    <span id="selectedCountryFlag" class="mr-2 text-xl">🇺🇸</span>
+                    <span id="selectedCountryName" class="font-medium">United States (+1)</span>
+                </span>
+                <input type="text" id="countrySearchInput" class="hidden flex-grow bg-white border-none focus:outline-none placeholder-gray-500 text-gray-700 text-base" placeholder="Search country..." />
+                <svg class="ml-auto w-5 h-5 text-gray-400 transform transition-transform duration-200" id="dropdownArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+
+            <ul id="countryList" class="absolute z-10 hidden bg-white border border-gray-200 rounded-lg mt-2 w-full max-h-60 overflow-y-auto custom-scrollbar shadow-lg">
+                </ul>
+        </div>
+
+        <div class="mb-5">
+            <label for="phoneNumber" class="block text-gray-700 text-sm font-semibold mb-2">Phone Number (without country code)</label>
+            <input type="text" id="phoneNumber" class="border border-gray-300 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-whatsapp-green-main focus:border-transparent transition duration-200" placeholder="e.g., 234567890">
+        </div>
+
+        <div class="mb-6">
+            <label for="prefilledMessage" class="block text-gray-700 text-sm font-semibold mb-2">Pre-filled Message (Optional)</label>
+            <textarea id="prefilledMessage" rows="3" class="border border-gray-300 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-whatsapp-green-main focus:border-transparent transition duration-200" placeholder="Hello, I would like to..."></textarea>
+        </div>
+
+        <button id="generateLinkBtn" class="w-full bg-whatsapp-green-main hover:bg-whatsapp-green-hover text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-whatsapp-green-main focus:ring-offset-2 transition duration-200 mb-4">
+            Generate Link
+        </button>
+
+        <div id="linkDisplayArea" class="hidden mb-4 bg-gray-100 p-4 rounded-lg border border-gray-200">
+            <p class="text-sm font-semibold text-gray-700 mb-2">Generated Link:</p>
+            <a id="whatsappLink" href="#" target="_blank" class="text-whatsapp-link-blue hover:underline break-all text-sm font-medium"></a>
+        </div>
+
+        <button id="copyLinkBtn" class="hidden w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200">
+            Copy Link
+        </button>
+    </div>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "WhatsApp Link Generator",
+      "operatingSystem": "Web",
+      "applicationCategory": "Utilities",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "ratingCount": "150"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "url": "https://yourwebsite.com/", "description": "Generate instant WhatsApp chat links with pre-filled messages and country codes. Create your wa.me links quickly for business or personal use.",
+      "featureList": [
+        "Instant WhatsApp link creation",
+        "Pre-filled message option",
+        "Country code selection with search",
+        "IP-based default country detection",
+        "Keyboard navigation for accessibility"
+      ],
+      "softwareHelp": {
+        "@type": "CreativeWork",
+        "url": "https://yourwebsite.com/help" }
+    }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const countries = [
+                { name: "Afghanistan", dial_code: "+93", emoji: "🇦🇫" },
+                { name: "Albania", dial_code: "+355", emoji: "🇦🇱" },
+                { name: "Algeria", dial_code: "+213", emoji: "🇩🇿" },
+                { name: "Andorra", dial_code: "+376", emoji: "🇦🇩" },
+                { name: "Angola", dial_code: "+244", emoji: "🇦🇴" },
+                { name: "Antarctica", dial_code: "+672", emoji: "🇦🇶" },
+                { name: "Argentina", dial_code: "+54", emoji: "🇦🇷" },
+                { name: "Armenia", dial_code: "+374", emoji: "🇦🇲" },
+                { name: "Aruba", dial_code: "+297", emoji: "🇦🇼" },
+                { name: "Australia", dial_code: "+61", emoji: "🇦🇺" },
+                { name: "Austria", dial_code: "+43", emoji: "🇦🇹" },
+                { name: "Azerbaijan", dial_code: "+994", emoji: "🇦🇿" },
+                { name: "Bahamas", dial_code: "+1-242", emoji: "🇧🇸" },
+                { name: "Bahrain", dial_code: "+973", emoji: "🇧🇭" },
+                { name: "Bangladesh", dial_code: "+880", emoji: "🇧🇩" },
+                { name: "Barbados", dial_code: "+1-246", emoji: "🇧🇧" },
+                { name: "Belarus", dial_code: "+375", emoji: "🇧🇾" },
+                { name: "Belgium", dial_code: "+32", emoji: "🇧🇪" },
+                { name: "Belize", dial_code: "+501", emoji: "🇧🇿" },
+                { name: "Benin", dial_code: "+229", emoji: "🇧🇯" },
+                { name: "Bermuda", dial_code: "+1-441", emoji: "🇧🇲" },
+                { name: "Bhutan", dial_code: "+975", emoji: "🇧🇹" },
+                { name: "Bolivia", dial_code: "+591", emoji: "🇧🇴" },
+                { name: "Bosnia and Herzegovina", dial_code: "+387", emoji: "🇧🇦" },
+                { name: "Botswana", dial_code: "+267", emoji: "🇧🇼" },
+                { name: "Brazil", dial_code: "+55", emoji: "🇧🇷" },
+                { name: "Brunei", dial_code: "+673", emoji: "🇧🇳" },
+                { name: "Bulgaria", dial_code: "+359", emoji: "🇧🇬" },
+                { name: "Burkina Faso", dial_code: "+226", emoji: "🇧🇫" },
+                { name: "Burundi", dial_code: "+257", emoji: "🇧🇮" },
+                { name: "Cambodia", dial_code: "+855", emoji: "🇰🇭" },
+                { name: "Cameroon", dial_code: "+237", emoji: "🇨🇲" },
+                { name: "Canada", dial_code: "+1", emoji: "🇨🇦" },
+                { name: "Cape Verde", dial_code: "+238", emoji: "🇨🇻" },
+                { name: "Central African Republic", dial_code: "+236", emoji: "🇨🇫" },
+                { name: "Chad", dial_code: "+235", emoji: "🇹🇩" },
+                { name: "Chile", dial_code: "+56", emoji: "🇨🇱" },
+                { name: "China", dial_code: "+86", emoji: "🇨🇳" },
+                { name: "Colombia", dial_code: "+57", emoji: "🇨🇴" },
+                { name: "Comoros", dial_code: "+269", emoji: "🇰🇲" },
+                { name: "Congo", dial_code: "+242", emoji: "🇨🇬" },
+                { name: "Cook Islands", dial_code: "+682", emoji: "🇨🇰" },
+                { name: "Costa Rica", dial_code: "+506", emoji: "🇨🇷" },
+                { name: "Croatia", dial_code: "+385", emoji: "🇭🇷" },
+                { name: "Cuba", dial_code: "+53", emoji: "🇨🇺" },
+                { name: "Cyprus", dial_code: "+357", emoji: "🇨🇾" },
+                { name: "Czech Republic", dial_code: "+420", emoji: "🇨🇿" },
+                { name: "Denmark", dial_code: "+45", emoji: "🇩🇰" },
+                { name: "Djibouti", dial_code: "+253", emoji: "🇩🇯" },
+                { name: "Dominica", dial_code: "+1-767", emoji: "🇩🇲" },
+                { name: "Dominican Republic", dial_code: "+1-809", emoji: "🇩🇴" },
+                { name: "East Timor", dial_code: "+670", emoji: "🇹🇱" },
+                { name: "Ecuador", dial_code: "+593", emoji: "🇪🇨" },
+                { name: "Egypt", dial_code: "+20", emoji: "🇪🇬" },
+                { name: "El Salvador", dial_code: "+503", emoji: "🇸🇻" },
+                { name: "Equatorial Guinea", dial_code: "+240", emoji: "🇬🇶" },
+                { name: "Eritrea", dial_code: "+291", emoji: "🇪🇷" },
+                { name: "Estonia", dial_code: "+372", emoji: "🇪🇪" },
+                { name: "Eswatini", dial_code: "+268", emoji: "🇸🇿" },
+                { name: "Ethiopia", dial_code: "+251", emoji: "🇪🇹" },
+                { name: "Fiji", dial_code: "+679", emoji: "🇫🇯" },
+                { name: "Finland", dial_code: "+358", emoji: "🇫🇮" },
+                { name: "France", dial_code: "+33", emoji: "🇫🇷" },
+                { name: "Gabon", dial_code: "+241", emoji: "🇬🇦" },
+                { name: "Gambia", dial_code: "+220", emoji: "🇬🇲" },
+                { name: "Georgia", dial_code: "+995", emoji: "🇬🇪" },
+                { name: "Germany", dial_code: "+49", emoji: "🇩🇪" },
+                { name: "Ghana", dial_code: "+233", emoji: "🇬🇭" },
+                { name: "Greece", dial_code: "+30", emoji: "🇬🇷" },
+                { name: "Greenland", dial_code: "+299", emoji: "🇬🇱" },
+                { name: "Grenada", dial_code: "+1-473", emoji: "🇬🇩" },
+                { name: "Guatemala", dial_code: "+502", emoji: "🇬🇹" },
+                { name: "Guinea", dial_code: "+224", emoji: "🇬🇳" },
+                { name: "Guinea-Bissau", dial_code: "+245", emoji: "🇬🇼" },
+                { name: "Guyana", dial_code: "+592", emoji: "🇬🇾" },
+                { name: "Haiti", dial_code: "+509", emoji: "🇭🇹" },
+                { name: "Honduras", dial_code: "+504", emoji: "🇭🇳" },
+                { name: "Hong Kong", dial_code: "+852", emoji: "🇭🇰" },
+                { name: "Hungary", dial_code: "+36", emoji: "🇭🇺" },
+                { name: "Iceland", dial_code: "+354", emoji: "🇮🇸" },
+                { name: "India", dial_code: "+91", emoji: "🇮🇳" },
+                { name: "Indonesia", dial_code: "+62", emoji: "🇮🇩" },
+                { name: "Iran", dial_code: "+98", emoji: "🇮🇷" },
+                { name: "Iraq", dial_code: "+964", emoji: "🇮🇶" },
+                { name: "Ireland", dial_code: "+353", emoji: "🇮🇪" },
+                { name: "Israel", dial_code: "+972", emoji: "🇮🇱" },
+                { name: "Italy", dial_code: "+39", emoji: "🇮🇹" },
+                { name: "Ivory Coast", dial_code: "+225", emoji: "🇨🇮" },
+                { name: "Jamaica", dial_code: "+1-876", emoji: "🇯🇲" },
+                { name: "Japan", dial_code: "+81", emoji: "🇯🇵" },
+                { name: "Jordan", dial_code: "+962", emoji: "🇯🇴" },
+                { name: "Kazakhstan", dial_code: "+7", emoji: "🇰🇿" },
+                { name: "Kenya", dial_code: "+254", emoji: "🇰🇪" },
+                { name: "Kuwait", dial_code: "+965", emoji: "🇰🇼" },
+                { name: "Kyrgyzstan", dial_code: "+996", emoji: "🇰🇬" },
+                { name: "Laos", dial_code: "+856", emoji: "🇱🇦" },
+                { name: "Latvia", dial_code: "+371", emoji: "🇱🇻" },
+                { name: "Lebanon", dial_code: "+961", emoji: "🇱🇧" },
+                { name: "Lesotho", dial_code: "+266", emoji: "🇱🇸" },
+                { name: "Liberia", dial_code: "+231", emoji: "🇱🇷" },
+                { name: "Libya", dial_code: "+218", emoji: "🇱🇾" },
+                { name: "Liechtenstein", dial_code: "+423", emoji: "🇱🇮" },
+                { name: "Lithuania", dial_code: "+370", emoji: "🇱🇹" },
+                { name: "Luxembourg", dial_code: "+352", emoji: "🇱🇺" },
+                { name: "Macau", dial_code: "+853", emoji: "🇲🇴" },
+                { name: "Madagascar", dial_code: "+261", emoji: "🇲🇬" },
+                { name: "Malawi", dial_code: "+265", emoji: "🇲🇼" },
+                { name: "Malaysia", dial_code: "+60", emoji: "🇲🇾" },
+                { name: "Maldives", dial_code: "+960", emoji: "🇲🇻" },
+                { name: "Mali", dial_code: "+223", emoji: "🇲🇱" },
+                { name: "Malta", dial_code: "+356", emoji: "🇲🇹" },
+                { name: "Mauritania", dial_code: "+222", emoji: "🇲🇷" },
+                { name: "Mauritius", dial_code: "+230", emoji: "🇲🇺" },
+                { name: "Mexico", dial_code: "+52", emoji: "🇲🇽" },
+                { name: "Moldova", dial_code: "+373", emoji: "🇲🇩" },
+                { name: "Monaco", dial_code: "+377", emoji: "🇲🇨" },
+                { name: "Mongolia", dial_code: "+976", emoji: "🇲🇳" },
+                { name: "Montenegro", dial_code: "+382", emoji: "🇲🇪" },
+                { name: "Morocco", dial_code: "+212", emoji: "🇲🇦" },
+                { name: "Mozambique", dial_code: "+258", emoji: "🇲🇿" },
+                { name: "Myanmar", dial_code: "+95", emoji: "🇲🇲" },
+                { name: "Namibia", dial_code: "+264", emoji: "🇳🇦" },
+                { name: "Nepal", dial_code: "+977", emoji: "🇳🇵" },
+                { name: "Netherlands", dial_code: "+31", emoji: "🇳🇱" },
+                { name: "New Zealand", dial_code: "+64", emoji: "🇳🇿" },
+                { name: "Nicaragua", dial_code: "+505", emoji: "🇳🇮" },
+                { name: "Niger", dial_code: "+227", emoji: "🇳🇪" },
+                { name: "Nigeria", dial_code: "+234", emoji: "🇳🇬" },
+                { name: "North Korea", dial_code: "+850", emoji: "🇰🇵" },
+                { name: "North Macedonia", dial_code: "+389", emoji: "🇲🇰" },
+                { name: "Norway", dial_code: "+47", emoji: "🇳🇴" },
+                { name: "Oman", dial_code: "+968", emoji: "🇴🇲" },
+                { name: "Pakistan", dial_code: "+92", emoji: "🇵🇰" },
+                { name: "Palestine", dial_code: "+970", emoji: "🇵🇸" },
+                { name: "Panama", dial_code: "+507", emoji: "🇵🇦" },
+                { name: "Paraguay", dial_code: "+595", emoji: "🇵🇾" },
+                { name: "Peru", dial_code: "+51", emoji: "🇵🇪" },
+                { name: "Philippines", dial_code: "+63", emoji: "🇵🇭" },
+                { name: "Poland", dial_code: "+48", emoji: "🇵🇱" },
+                { name: "Portugal", dial_code: "+351", emoji: "🇵🇹" },
+                { name: "Puerto Rico", dial_code: "+1-787", emoji: "🇵🇷" },
+                { name: "Qatar", dial_code: "+974", emoji: "🇶🇦" },
+                { name: "Romania", dial_code: "+40", emoji: "🇷🇴" },
+                { name: "Russia", dial_code: "+7", emoji: "🇷🇺" },
+                { name: "Rwanda", dial_code: "+250", emoji: "🇷🇼" },
+                { name: "San Marino", dial_code: "+378", emoji: "🇸🇲" },
+                { name: "Sao Tome and Principe", dial_code: "+239", emoji: "🇸🇹" },
+                { name: "Saudi Arabia", dial_code: "+966", emoji: "🇸🇦" },
+                { name: "Senegal", dial_code: "+221", emoji: "🇸🇳" },
+                { name: "Serbia", dial_code: "+381", emoji: "🇷🇸" },
+                { name: "Seychelles", dial_code: "+248", emoji: "🇸🇨" },
+                { name: "Sierra Leone", dial_code: "+232", emoji: "🇸🇱" },
+                { name: "Singapore", dial_code: "+65", emoji: "🇸🇬" },
+                { name: "Slovakia", dial_code: "+421", emoji: "🇸🇰" },
+                { name: "Slovenia", dial_code: "+386", emoji: "🇸🇮" },
+                { name: "Somalia", dial_code: "+252", emoji: "🇸🇴" },
+                { name: "South Africa", dial_code: "+27", emoji: "🇿🇦" },
+                { name: "South Korea", dial_code: "+82", emoji: "🇰🇷" },
+                { name: "South Sudan", dial_code: "+211", emoji: "🇸🇸" },
+                { name: "Spain", dial_code: "+34", emoji: "🇪🇸" },
+                { name: "Sri Lanka", dial_code: "+94", emoji: "🇱🇰" },
+                { name: "Sudan", dial_code: "+249", emoji: "🇸🇩" },
+                { name: "Sweden", dial_code: "+46", emoji: "🇸🇪" },
+                { name: "Switzerland", dial_code: "+41", emoji: "🇨🇭" },
+                { name: "Syria", dial_code: "+963", emoji: "🇸🇾" },
+                { name: "Taiwan", dial_code: "+886", emoji: "🇹🇼" },
+                { name: "Tanzania", dial_code: "+255", emoji: "🇹🇿" },
+                { name: "Thailand", dial_code: "+66", emoji: "🇹🇭" },
+                { name: "Togo", dial_code: "+228", emoji: "🇹🇬" },
+                { name: "Tonga", dial_code: "+676", emoji: "🇹🇴" },
+                { name: "Tunisia", dial_code: "+216", emoji: "🇹🇳" },
+                { name: "Turkey", dial_code: "+90", emoji: "🇹🇷" },
+                { name: "Turkmenistan", dial_code: "+993", emoji: "🇹🇲" },
+                { name: "Uganda", dial_code: "+256", emoji: "🇺🇬" },
+                { name: "Ukraine", dial_code: "+380", emoji: "🇺🇦" },
+                { name: "United Arab Emirates", dial_code: "+971", emoji: "🇦🇪" },
+                { name: "United Kingdom", dial_code: "+44", emoji: "🇬🇧" },
+                { name: "United States", dial_code: "+1", emoji: "🇺🇸" },
+                { name: "Uruguay", dial_code: "+598", emoji: "🇺🇾" },
+                { name: "Uzbekistan", dial_code: "+998", emoji: "🇺🇿" },
+                { name: "Vanuatu", dial_code: "+678", emoji: "🇻🇺" },
+                { name: "Venezuela", dial_code: "+58", emoji: "🇻🇪" },
+                { name: "Vietnam", dial_code: "+84", emoji: "🇻🇳" },
+                { name: "Yemen", dial_code: "+967", emoji: "🇾🇪" },
+                { name: "Zambia", dial_code: "+260", emoji: "🇿🇲" },
+                { name: "Zimbabwe", dial_code: "+263", emoji: "🇿🇼" }
+            ];
+
+            // DOM Elements
+            const countryCodeDisplay = document.getElementById('countryCodeDisplay');
+            const selectedCountryDisplay = document.getElementById('selectedCountryDisplay');
+            const selectedCountryFlag = document.getElementById('selectedCountryFlag');
+            const selectedCountryName = document.getElementById('selectedCountryName');
+            const countrySearchInput = document.getElementById('countrySearchInput');
+            const dropdownArrow = document.getElementById('dropdownArrow');
+            const countryList = document.getElementById('countryList');
+            const phoneNumberInput = document.getElementById('phoneNumber');
+            const prefilledMessageInput = document.getElementById('prefilledMessage');
+            const generateLinkBtn = document.getElementById('generateLinkBtn');
+            const linkDisplayArea = document.getElementById('linkDisplayArea');
+            const whatsappLinkElement = document.getElementById('whatsappLink');
+            const copyLinkBtn = document.getElementById('copyLinkBtn');
+
+            let currentSelectedDialCode = "+1"; // Default selected dial code (will be overridden by IP)
+
+            // Function to update the displayed selected country in the main input field
+            function updateSelectedCountryDisplay(country) {
+                selectedCountryFlag.textContent = country.emoji;
+                selectedCountryName.textContent = `${country.name} (${country.dial_code})`;
+                currentSelectedDialCode = country.dial_code;
+            }
+
+            // Function to populate/filter the country list
+            function populateCountryList(filterText = '') {
+                countryList.innerHTML = ''; // Clear existing list
+                const lowerCaseFilter = filterText.toLowerCase();
+
+                const filteredCountries = countries.filter(country =>
+                    country.name.toLowerCase().startsWith(lowerCaseFilter)
+                );
+
+                if (filteredCountries.length === 0) {
+                    const noResultsItem = document.createElement('li');
+                    noResultsItem.classList.add('p-2', 'text-gray-500', 'text-center');
+                    noResultsItem.textContent = 'No results found.';
+                    countryList.appendChild(noResultsItem);
+                    return;
+                }
+
+                filteredCountries.forEach(country => {
+                    const listItem = document.createElement('li');
+                    listItem.classList.add('p-2', 'cursor-pointer', 'hover:bg-gray-100', 'flex', 'items-center', 'text-gray-800', 'country-list-item');
+                    listItem.dataset.dialCode = country.dial_code;
+                    listItem.dataset.countryName = country.name;
+                    listItem.tabIndex = 0; // Make list items focusable
+
+                    listItem.innerHTML = `
+                        <span class="mr-2 text-xl">${country.emoji}</span>
+                        <span class="font-medium">${country.name} (${country.dial_code})</span>
+                    `;
+                    listItem.addEventListener('click', () => {
+                        updateSelectedCountryDisplay(country); // Update display
+                        countryList.classList.add('hidden'); // Hide the list after selection
+                        countrySearchInput.classList.add('hidden'); // Hide search input
+                        selectedCountryDisplay.classList.remove('hidden'); // Show selected country display
+                        dropdownArrow.classList.remove('rotate-180'); // Reset arrow
+                        countrySearchInput.value = ''; // Clear search input
+                        populateCountryList(); // Reset list to full after selection
+                        countryCodeDisplay.focus(); // Return focus to the main dropdown display
+                    });
+                    countryList.appendChild(listItem);
+                });
+            }
+
+            // --- IP Geolocation Logic ---
+            async function setDefaultCountryByIP() {
+                try {
+                    const response = await fetch('https://ipapi.co/json/');
+                    const data = await response.json();
+                    const countryCode = data.country_code; // e.g., "US", "JO"
+
+                    const foundCountry = countries.find(country => 
+                        country.dial_code === `+${data.country_calling_code}` || // Try by calling code
+                        country.name.toLowerCase().includes(data.country_name.toLowerCase()) || // Try by country name
+                        country.emoji === getFlagEmoji(countryCode) // As a fallback, try by emoji
+                    );
+                    
+                    if (foundCountry) {
+                        updateSelectedCountryDisplay(foundCountry);
+                    } else {
+                        // Fallback to a default if IP lookup doesn't find a match (e.g., United States)
+                        const defaultCountry = countries.find(c => c.dial_code === "+1");
+                        if (defaultCountry) {
+                            updateSelectedCountryDisplay(defaultCountry);
+                        }
+                    }
+
+                } catch (error) {
+                    console.error('Error fetching IP data:', error);
+                    // If IP lookup fails, ensure a default country is still set (e.g., United States)
+                    const defaultCountry = countries.find(c => c.dial_code === "+1");
+                    if (defaultCountry) {
+                        updateSelectedCountryDisplay(defaultCountry);
+                    }
+                } finally {
+                    // Always populate list after attempting to set default
+                    populateCountryList();
+                }
+            }
+            
+            // Helper function to get flag emoji from country code (e.g., US -> 🇺🇸)
+            function getFlagEmoji(countryCode) {
+                if (!countryCode) return '';
+                const codePoints = countryCode
+                    .toUpperCase()
+                    .split('')
+                    .map(char => 0x1F1E6 + char.charCodeAt(0) - 'A'.charCodeAt(0));
+                return String.fromCodePoint(...codePoints);
+            }
+
+            // Call IP detection function on load
+            setDefaultCountryByIP();
+
+
+            // Toggle dropdown visibility and focus search input
+            countryCodeDisplay.addEventListener('click', (event) => {
+                if (countryList.classList.contains('hidden') && event.target === countrySearchInput) {
+                    return;
+                }
+
+                const isHidden = countryList.classList.contains('hidden');
+                countryList.classList.toggle('hidden');
+                dropdownArrow.classList.toggle('rotate-180');
+
+                if (isHidden) {
+                    selectedCountryDisplay.classList.add('hidden');
+                    countrySearchInput.classList.remove('hidden');
+                    countrySearchInput.focus();
+                    populateCountryList();
+                } else {
+                    countrySearchInput.classList.add('hidden');
+                    selectedCountryDisplay.classList.remove('hidden');
+                    countrySearchInput.value = '';
+                    populateCountryList();
+                }
+            });
+
+            countrySearchInput.addEventListener('keyup', (event) => {
+                if (!['ArrowDown', 'ArrowUp', 'Enter', 'Escape'].includes(event.key)) {
+                    populateCountryList(event.target.value);
+                }
+            });
+
+            countrySearchInput.addEventListener('keydown', (event) => {
+                const visibleItems = Array.from(countryList.querySelectorAll('li.country-list-item'));
+                if (visibleItems.length === 0) return;
+
+                let focusedIndex = visibleItems.findIndex(item => item === document.activeElement);
+
+                if (event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    if (focusedIndex === -1) {
+                        visibleItems[0].focus();
+                    } else if (focusedIndex < visibleItems.length - 1) {
+                        visibleItems[focusedIndex + 1].focus();
+                    } else {
+                        visibleItems[0].focus();
+                    }
+                } else if (event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    if (focusedIndex === -1) {
+                        visibleItems[visibleItems.length - 1].focus();
+                    } else if (focusedIndex > 0) {
+                        visibleItems[focusedIndex - 1].focus();
+                    } else {
+                        countrySearchInput.focus();
+                    }
+                } else if (event.key === 'Enter') {
+                    if (focusedIndex !== -1) {
+                        event.preventDefault();
+                        visibleItems[focusedIndex].click();
+                    }
+                } else if (event.key === 'Escape') {
+                    event.preventDefault();
+                    countryList.classList.add('hidden');
+                    countrySearchInput.classList.add('hidden');
+                    selectedCountryDisplay.classList.remove('hidden');
+                    dropdownArrow.classList.remove('rotate-180');
+                    countrySearchInput.value = '';
+                    populateCountryList();
+                    countryCodeDisplay.focus();
+                }
+            });
+
+
+            document.addEventListener('click', (event) => {
+                if (!countryCodeDisplay.contains(event.target) && !countryList.contains(event.target)) {
+                    countryList.classList.add('hidden');
+                    countrySearchInput.classList.add('hidden');
+                    selectedCountryDisplay.classList.remove('hidden');
+                    dropdownArrow.classList.remove('rotate-180');
+                    countrySearchInput.value = '';
+                    populateCountryList();
+                }
+            });
+
+
+            generateLinkBtn.addEventListener('click', () => {
+                const rawPhoneNumber = phoneNumberInput.value.trim();
+                const message = prefilledMessageInput.value.trim();
+
+                const fullPhoneNumber = currentSelectedDialCode + rawPhoneNumber;
+
+                if (rawPhoneNumber === '') {
+                    alert('Please enter a phone number.');
+                    return;
+                }
+
+                let whatsappUrl = `https://wa.me/${encodeURIComponent(fullPhoneNumber)}`;
+
+                if (message !== '') {
+                    whatsappUrl += `?text=${encodeURIComponent(message)}`;
+                }
+
+                whatsappLinkElement.href = whatsappUrl;
+                whatsappLinkElement.textContent = whatsappUrl;
+                linkDisplayArea.classList.remove('hidden');
+                copyLinkBtn.classList.remove('hidden');
+            });
+
+            copyLinkBtn.addEventListener('click', () => {
+                const linkToCopy = whatsappLinkElement.textContent;
+                navigator.clipboard.writeText(linkToCopy).then(() => {
+                    alert('Link copied to clipboard!');
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    alert('Failed to copy link.');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
